@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Configuration;
+using System.Dynamic;
 using System.IO;
 using Edubase.Common;
 using Edubase.Web.UI.Models;
@@ -14,6 +15,7 @@ using Edubase.Services.Texuna;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace Edubase.Web.UI.Areas.Establishments.Controllers
 {
@@ -57,6 +59,28 @@ namespace Edubase.Web.UI.Areas.Establishments.Controllers
 
         private IAuthenticationManager AuthenticationManager => HttpContext.GetOwinContext().Authentication;
 
+        [HttpGet, Route("Prototype")]
+        public async Task<ActionResult> Prototype(EstablishmentSearchViewModel model)
+        {
+            model.SearchQueryString = Request.QueryString.ToString();
+
+            var retVal = await SearchByUrnAsync(model);
+            if (retVal != null) return retVal;
+
+            model.SavedFilterToken = TempData["SavedToken"]?.ToString();
+
+            // if the user navigates back to or reloads the search results => look up saved results token
+            if (Request.IsAuthenticated && string.IsNullOrEmpty(model.SavedFilterToken))
+            {
+                var userId = User.Identity.GetUserId();
+                model.SavedFilterToken = (await _userPreferenceRepository.GetAsync(userId))?.SavedSearchToken;
+            }
+
+            var payload = await GetEstablishmentSearchPayload(model);
+            if (!payload.Success) model.Error = payload.ErrorMessage;
+            return await ProcessEstablishmentsSearch(model, payload.Object, true);
+        }
+
         [HttpGet, Route(Name = "EstabSearch")]
         public async Task<ActionResult> Index(EstablishmentSearchViewModel model)
         {
@@ -89,6 +113,48 @@ namespace Edubase.Web.UI.Areas.Establishments.Controllers
             HttpContext.Response.Headers.Add("x-show-date-filter-warning",
                 model.ShowDateFilterWarning.ToString().ToLower());
             return PartialView("Partials/_EstablishmentSearchResults", model);
+        }
+
+        [HttpGet, Route("estab-results-json")]
+        public async Task<ActionResult> EstabJsonResults(EstablishmentSearchViewModel model)
+        {
+            var payload = await GetEstablishmentSearchPayload(model);
+            if (!payload.Success) model.Error = payload.ErrorMessage;
+            await ProcessEstablishmentsSearch(model, payload.Object);
+            HttpContext.Response.Headers.Add("x-count", model.Count.ToString());
+            HttpContext.Response.Headers.Add("x-show-date-filter-warning",
+                model.ShowDateFilterWarning.ToString().ToLower());
+
+            var settings = new JsonSerializerSettings
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                PreserveReferencesHandling = PreserveReferencesHandling.None
+            };
+
+            dynamic jsonResults = new ExpandoObject();
+            dynamic filterSelections = new ExpandoObject();
+
+            //todo : use the bind aliases and complete the filters
+            filterSelections.SearchType = model.SearchType.ToString();
+            filterSelections.a = model.SelectedEstablishmentTypeIds;
+            filterSelections.b = model.SelectedEstablishmentStatusIds;
+            filterSelections.c = model.SelectedEducationPhaseIds;
+            filterSelections.d = model.SelectedLocalAuthorityIds;
+            filterSelections.e = model.SelectedReligiousCharacterIds;
+            filterSelections.Location = model.LocationSearchModel;
+            filterSelections.LocationName = model.LocationSearchModel.Text;
+            filterSelections.AutoSuggestValue = model.LocationSearchModel.AutoSuggestValue;
+
+
+            jsonResults.results = model.Results;
+            jsonResults.filters = filterSelections;
+
+
+
+
+            var json = JsonConvert.SerializeObject(jsonResults, settings);
+            return Json(json, JsonRequestBehavior.AllowGet);
         }
 
         [HttpGet, Route("results-json")]
@@ -441,7 +507,7 @@ namespace Edubase.Web.UI.Areas.Establishments.Controllers
         }
 
         private async Task<ActionResult> ProcessEstablishmentsSearch(EstablishmentSearchViewModel model,
-            EstablishmentSearchPayload payload)
+            EstablishmentSearchPayload payload, bool isPrototype = false)
         {
             if (model.HasError)
             {
@@ -461,8 +527,19 @@ namespace Edubase.Web.UI.Areas.Establishments.Controllers
                     return NoResults(model);
                 }
 
-                var localAuthorities = await _lookupService.LocalAuthorityGetAllAsync();
+                var permittedStatusIds = await _establishmentReadService.GetPermittedStatusIdsAsync(User);
+                model.EducationPhases =
+                    (await _lookupService.EducationPhasesGetAllAsync()).Select(x => new LookupItemViewModel(x));
+                model.EstablishmentStatuses = (await _lookupService.EstablishmentStatusesGetAllAsync())
+                    .Where(x => permittedStatusIds == null || permittedStatusIds.Contains(x.Id))
+                    .Select(x => new LookupItemViewModel(x));
 
+                var establishmentTypes = await _lookupService.EstablishmentTypesGetAllAsync();
+
+                model.EstablishmentTypeLookup = establishmentTypes.ToDictionary(e => e.Id, e => e.Name);
+
+                var localAuthorities = await _lookupService.LocalAuthorityGetAllAsync();
+                var counties = (await _lookupService.CountiesGetAllAsync()).Where(c => c.Id != 63); //remove "not recorded"
                 foreach (var item in model.Results)
                 {
                     model.Addresses.Add(item, await item.GetAddressAsync(_lookupService));
@@ -473,8 +550,28 @@ namespace Edubase.Web.UI.Areas.Establishments.Controllers
                         if (code != null) laEstab = string.Concat(code, "/", item.EstablishmentNumber?.ToString("D4"));
                     }
 
+                    item.FullAddress = StringUtil.ConcatNonEmpties(", ", item.Address_Line1,
+                        item.Address_Locality,
+                        item.Address_Line3,
+                        item.Address_CityOrTown,
+                        counties.FirstOrDefault(c => c.Id == item.Address_CountyId)?.Name,
+                        item.Address_PostCode);
+
+                    item.StatusLabel =
+                        model.EstablishmentStatuses.FirstOrDefault(x => x.Id == item.StatusId)?.Name ??
+                        "Not recorded";
+
+                    item.PhaseLabel = model.EducationPhases.FirstOrDefault(x => x.Id == item.EducationPhaseId).Name ??
+                                      "Not recorded";
+                    item.TypeLabel = (item.TypeId != null && model.EstablishmentTypeLookup.ContainsKey(item.TypeId.Value)) ? model.EstablishmentTypeLookup[item.TypeId.Value] : "Not recorded";
+
+                    item.LaName = localAuthorities.FirstOrDefault(x => x.Id == item.LocalAuthorityId)?.Name ??
+                                  "Not recorded";
+                    item.LaEstabValue = laEstab;
+
                     model.LAESTABs.Add(item, laEstab);
                 }
+
             }
 
             if (model.Count == 1 && model.GoToDetailPageOnOneResult)
@@ -499,19 +596,16 @@ namespace Edubase.Web.UI.Areas.Establishments.Controllers
 
                 model.EstablishmentTypeLookup = establishmentTypes.ToDictionary(e => e.Id, e => e.Name);
 
-                model.EstablishmentStatuses = (await _lookupService.EstablishmentStatusesGetAllAsync())
-                    .Where(x => permittedStatusIds == null || permittedStatusIds.Contains(x.Id))
-                    .Select(x => new LookupItemViewModel(x));
 
-                model.EducationPhases =
-                    (await _lookupService.EducationPhasesGetAllAsync()).Select(x => new LookupItemViewModel(x));
 
                 model.ReligiousCharacters =
                     (await _lookupService.ReligiousCharactersGetAllAsync()).Select(x => new LookupItemViewModel(x));
 
                 await PopulateLookups(model);
-
-
+                if (isPrototype)
+                {
+                    return View("Prototype", model);
+                }
                 return View("Index", model);
             }
         }

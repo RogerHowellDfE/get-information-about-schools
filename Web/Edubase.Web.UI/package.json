@@ -16,7 +16,8 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@babel/preset-env": "^7.7.7",
+    "@babel/preset-env": "^7.14.7",
+    "@babel/preset-react": "^7.14.5",
     "@most/prelude": "^1.8.0",
     "autoprefixer": "^10.2.6",
     "babel-core": "^6.26.3",
@@ -47,11 +48,18 @@
     "webpack-cli": "^4.3.0"
   },
   "dependencies": {
+    "@babel/runtime": "^7.14.6",
+    "@reduxjs/toolkit": "^1.6.0",
     "awesomplete": "^1.1.5",
+    "axios": "^0.21.1",
     "extend": "^3.0.2",
     "glob": "^7.1.6",
     "govuk-frontend": "^3.12.0",
     "jquery": "^3.6.0",
-    "moment": "^2.29.1"
+    "moment": "^2.29.1",
+    "qs": "^6.10.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-redux": "^7.2.4"
   }
 }

@@ -95,7 +95,7 @@
                 }
                 else if (Model.SearchType == eSearchType.Location)
                 {
-                    var displayLocation = Model.LocationSearchModel.Text;
+                    var displayLocation = Model.LocationSearchModel.Text != null ? Model.LocationSearchModel.Text : "";
                     var lastIndex = displayLocation.LastIndexOf(",");
                     if (lastIndex > -1)
                     {

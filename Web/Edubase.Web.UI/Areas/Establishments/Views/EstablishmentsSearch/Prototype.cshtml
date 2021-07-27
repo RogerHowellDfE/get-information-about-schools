@@ -1,0 +1,102 @@
+@using Edubase.Web.UI.Models.Search
+@using Edubase.Web.UI.Helpers
+@using Edubase.Common
+@using Edubase.Services.Enums
+@using Newtonsoft.Json
+@using Newtonsoft.Json.Serialization
+@using M = Edubase.Web.UI.Areas.Establishments.Models.Search.EstablishmentSearchViewModel;
+@model M
+
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <h1 class="govuk-heading-xl gias-search-results--heading">Search results for establishments</h1>
+    </div>
+</div>
+
+<div class="govuk-grid-row" id="app-root">
+    @* <h2 class="govuk-heading-l">Hi Mattias. This is where I'll add the stuff for no-js.</h2> *@
+</div>
+@section ViewScripts
+{
+    <script nonce="@Html.ScriptNonce()">
+    var isLoggedIn = @(User.Identity.IsAuthenticated.ToString().ToLower());
+
+    var savedToken = '@Model.SavedFilterToken';
+    var filterConfig = [
+            {
+                id: 'Establishment type',
+                name: '@M.BIND_ALIAS_TYPEIDS',
+                items: @(Html.Raw(Json.Encode(Model.EstablishmentTypes.OrderBy(e => e.Name)))),
+                startExpanded: true,
+                initialFilter: true
+            },
+            {
+                id: 'Status',
+                name: '@M.BIND_ALIAS_STATUSIDS',
+                items: @(Html.Raw(Json.Encode(Model.EstablishmentStatuses.OrderBy(e => e.Name)))),
+                startExpanded: true,
+                initialFilter: true,
+                filterType: 'checkbox'
+
+            },
+            {
+                id: 'Phase of education',
+                name: '@M.BIND_ALIAS_PHASEIDS',
+                items: @(Html.Raw(Json.Encode(Model.EducationPhases.OrderBy(x => x.Name)))),
+                startExpanded: false,
+                initialFilter: true,
+                filterType: 'checkbox'
+            },
+            {
+                 id: 'Local authority',
+                 name:  '@M.BIND_ALIAS_LAIDS',
+                 items: @(Html.Raw(Json.Encode(Model.LocalAuthorities.OrderBy(x => x.Name)))),
+                 startExpanded: false,
+                 initialFilter: true,
+                 filterType: 'checkbox'
+            },
+            {
+                id: 'Religious character',
+                name: '@M.BIND_ALIAS_RELICHARIDS',
+                items: @Html.Raw(Json.Encode(Model.ReligiousCharacters.OrderBy(x => x.Name))),
+                 startExpanded: false,
+                 initialFilter: true,
+                 filterType: 'checkbox'
+            },
+            {
+                id: 'Open date',
+                name: 'OpenDate',
+                startExpanded: true,
+                initialFilter: false,
+                filterType: 'dateRange'
+            },
+            {
+                id: 'Close date',
+                name: 'CloseDate',
+                startExpanded: true,
+                initialFilter: false,
+                filterType: 'dateRange'
+            }
+    ];
+
+    var initialFilterSelections = {
+        "@M.BIND_ALIAS_TYPEIDS" : @(Html.Raw(Json.Encode(Model.SelectedEstablishmentTypeIds))),
+        "@M.BIND_ALIAS_STATUSIDS" : @(Html.Raw(Json.Encode(Model.SelectedEstablishmentStatusIds))),
+        "@M.BIND_ALIAS_PHASEIDS": @(Html.Raw(Json.Encode(Model.SelectedEducationPhaseIds))),
+        "@M.BIND_ALIAS_LAIDS": @(Html.Raw(Json.Encode(Model.SelectedLocalAuthorityIds))),
+       "@M.BIND_ALIAS_RELICHARIDS": @Html.Raw(Json.Encode(Model.SelectedReligiousCharacterIds)),
+       "searchType" : '@Model.SearchType',
+       "autoSuggestValue" : '@Model.LocationSearchModel.AutoSuggestValue',
+       "locationName" : '@Model.LocationSearchModel.Text'
+    };
+
+    const initialResults  = @Html.Raw(JsonConvert.SerializeObject(Model.Results, new JsonSerializerSettings
+                            {
+                                ContractResolver = new CamelCasePropertyNamesContractResolver()
+                            }));
+    const initialCount = @Model.Results.Count;
+    </script>
+
+    <script src="@Html.Raw(Html.GetWebpackScriptUrl("GiasSearchResults.*.js"))"></script>
+}
