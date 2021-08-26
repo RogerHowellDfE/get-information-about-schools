@@ -47,6 +47,26 @@ namespace Edubase.Web.UI.Controllers
             return View(model);
         }
 
+        [Route("Banners/Audit"), EdubaseAuthorize(Roles = AuthorizedRoles.IsAdmin)]
+        public async Task<ActionResult> BannerAudit()
+        {
+            var result = await _BannerRepository.GetAllAsync(1000);
+            var audit = await _BannerRepository.GetAllAsync(1000, null, eNotificationBannerPartition.Archive);
+            var items = result.Items.ToList();
+            items.AddRange(audit.Items);
+
+            var model = new NotificationsBannerAuditViewModel(items);
+
+            if (TempData["ShowSaved"] != null)
+            {
+                ViewBag.ShowSaved = true;
+                TempData.Remove("ShowSaved");
+            }
+            return View(model);
+        }
+
+
+
 
         [Route("Banner/New", Name = "CreateBanner"), HttpGet, EdubaseAuthorize(Roles = AuthorizedRoles.IsAdmin)]
         public async Task<ActionResult> CreateBanner()

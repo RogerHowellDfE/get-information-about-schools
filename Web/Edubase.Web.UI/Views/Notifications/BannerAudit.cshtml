@@ -1,0 +1,144 @@
+@using System.Globalization
+@using Edubase.Common
+@using Edubase.Data.Entity
+@model Edubase.Web.UI.Models.Notifications.NotificationsBannerAuditViewModel
+@{
+    ViewBag.Title = "Get Information about Schools";
+    ViewBag.SiteSection = "tools";
+}
+
+@section BreadCrumbs
+{
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <div class="govuk-breadcrumbs">
+                <ol class="govuk-breadcrumbs__list">
+                    <li class="govuk-breadcrumbs__list-item">
+                        @Html.ActionLink("Search", "Index", "Search", new { area = "" }, new { @class = "govuk-breadcrumbs__link" })
+                    </li>
+                    <li class="govuk-breadcrumbs__list-item">
+                        @Html.ActionLink("Tools", "Index", "Tools", new { area = "" }, new { @class = "govuk-breadcrumbs__link" })
+                    </li>
+                    <li class="govuk-breadcrumbs__list-item">
+                        @Html.ActionLink("Notifications", "Index", "Notifications", new { area = "" }, new { @class = "govuk-breadcrumbs__link" })
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <h1 class="govuk-heading-xl">Audit of notification banners</h1>
+    </div>
+</div>
+
+<div class="button-row govuk-!-margin-bottom-4">
+    @Html.ActionLink(
+        "Back",
+        "Index",
+        "Notifications",
+        null,
+        new { @class = "govuk-back-link gias-back-link--button", data_module = "govuk-button" })
+</div>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <h2 class="govuk-heading-m">History of notification banners</h2>
+    </div>
+</div>
+
+
+@if (Model.Banners.Any())
+{
+    var bannerCounter = 0;
+    var bannerTracker = string.Empty;
+    var previousBanner = new NotificationBanner();
+    foreach (var banner in Model.Banners)
+    {
+        if(banner.Tracker != bannerTracker)
+        {
+            bannerCounter++;
+            bannerTracker = banner.Tracker;
+            previousBanner = null;
+        }
+
+        var bannerEvent = (eNotificationBannerEvent) Enum.Parse(typeof(eNotificationBannerEvent), banner.AuditEvent, true);
+        var bannerTop = banner.Version == 1 && bannerCounter > 1? "govuk-!-margin-top-8" : "";
+
+        if (banner.Version == 1)
+        {
+            <div class="govuk-grid-row @bannerTop">
+                <div class="govuk-grid-column-two-thirds">
+                    <h3 class="govuk-heading-s">Notification banner @bannerCounter (@banner.Tracker)</h3>
+                </div>
+            </div>
+
+            Html.RenderPartial("_NotificationBannerPartial", banner, new ViewDataDictionary(this.ViewData) { { "bannerPreview", true } });
+        }
+
+<dl class="govuk-summary-list govuk-!-margin-top-6">
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">@(bannerEvent.EnumDisplayNameFor()):</dt>
+        <dd class="govuk-summary-list__value">@banner.Timestamp.ToString("h:mmtt", CultureInfo.InvariantCulture).ToLower() <span class="govuk-!-margin-right-2"></span> @banner.Timestamp.ToString("d MMMM yyyy", CultureInfo.InvariantCulture)</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">User:</dt>
+        <dd class="govuk-summary-list__value">@banner.AuditUser</dd>
+    </div>
+
+    @if (bannerEvent == eNotificationBannerEvent.Create || (previousBanner != null && banner.Start != previousBanner.Start))
+    {
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Visibility start:</dt>
+            <dd class="govuk-summary-list__value">@banner.Start.ToString("h:mmtt", CultureInfo.InvariantCulture).ToLower() <span class="govuk-!-margin-right-2"></span> @banner.Start.ToString("d MMMM yyyy", CultureInfo.InvariantCulture)</dd>
+        </div>
+    }
+
+    @if (bannerEvent == eNotificationBannerEvent.Create || (previousBanner != null && banner.End != previousBanner.End))
+    {
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Visibility end:</dt>
+            <dd class="govuk-summary-list__value">@banner.End.ToString("h:mmtt", CultureInfo.InvariantCulture).ToLower() <span class="govuk-!-margin-right-2"></span> @banner.End.ToString("d MMMM yyyy", CultureInfo.InvariantCulture)</dd>
+        </div>
+    }
+
+    @if (bannerEvent == eNotificationBannerEvent.Create || (previousBanner != null && banner.Content != previousBanner.Content))
+    {
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Message:</dt>
+            <dd class="govuk-summary-list__value">@banner.Content</dd>
+        </div>
+    }
+
+    @if (bannerEvent == eNotificationBannerEvent.Create || (previousBanner != null && banner.Importance != previousBanner.Importance))
+    {
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Status:</dt>
+            <dd class="govuk-summary-list__value">@(((eNotificationBannerImportance) banner.Importance).EnumDisplayNameFor())</dd>
+        </div>
+    }
+
+</dl>
+
+        if (bannerEvent == eNotificationBannerEvent.Update)
+        {
+            <details class="govuk-details" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">
+                        Show
+                    </span>
+                </summary>
+                <div class="govuk-details__text">
+                    @{
+                        Html.RenderPartial("_NotificationBannerPartial", banner, new ViewDataDictionary(this.ViewData) { { "bannerPreview", true } });
+                    }
+                </div>
+            </details>
+        }
+
+        previousBanner = banner;
+    }
+}
+

@@ -358,6 +358,7 @@
     <Compile Include="Helpers\LayoutHelper.cs" />
     <Compile Include="Helpers\NonceHelper.cs" />
     <Compile Include="Helpers\RouteDto.cs" />
+    <Compile Include="Models\Notifications\NotificationsBannerAuditViewModel.cs" />
     <Compile Include="Models\Notifications\NotificationsBannerViewModel.cs" />
     <Compile Include="Models\Notifications\NotificationsBannersViewModel.cs" />
     <Compile Include="Models\Notifications\NotificationsTemplateViewModel.cs" />
@@ -767,6 +768,7 @@
     <Content Include="Views\Notifications\ConfirmDeleteBanner.cshtml" />
     <Content Include="Views\Notifications\ConfirmDeleteTemplate.cshtml" />
     <Content Include="Areas\Establishments\Views\Establishment\EditDetailsEmpty.cshtml" />
+    <Content Include="Views\Notifications\BannerAudit.cshtml" />
     <None Include="Views\Unauthorized\Index.cshtml" />
     <Content Include="Views\Unauthorized\LoginFailed.cshtml" />
   </ItemGroup>
