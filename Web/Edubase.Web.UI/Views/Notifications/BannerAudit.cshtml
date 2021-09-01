@@ -65,7 +65,7 @@
         }
 
         var bannerEvent = (eNotificationBannerEvent) Enum.Parse(typeof(eNotificationBannerEvent), banner.AuditEvent, true);
-        var bannerTop = banner.Version == 1 && bannerCounter > 1? "govuk-!-margin-top-8" : "";
+        var bannerTop = banner.Version == 1 && bannerCounter > 1? "govuk-!-margin-top-9" : "";
 
         if (banner.Version == 1)
         {
@@ -78,56 +78,67 @@
             Html.RenderPartial("_NotificationBannerPartial", banner, new ViewDataDictionary(this.ViewData) { { "bannerPreview", true } });
         }
 
-<dl class="govuk-summary-list govuk-!-margin-top-6">
-    <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">@(bannerEvent.EnumDisplayNameFor()):</dt>
-        <dd class="govuk-summary-list__value">@banner.Timestamp.ToString("h:mmtt", CultureInfo.InvariantCulture).ToLower() <span class="govuk-!-margin-right-2"></span> @banner.Timestamp.ToString("d MMMM yyyy", CultureInfo.InvariantCulture)</dd>
-    </div>
-    <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">User:</dt>
-        <dd class="govuk-summary-list__value">@banner.AuditUser</dd>
-    </div>
+        <dl class="govuk-summary-list govuk-!-margin-top-6">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">@(bannerEvent.EnumDisplayNameFor()):</dt>
+                <dd class="govuk-summary-list__value">
+                    @banner.Timestamp.ToString("h:mmtt", CultureInfo.InvariantCulture).ToLower() <span class="govuk-!-margin-right-2"></span> @banner.Timestamp.ToString("d MMMM yyyy", CultureInfo.InvariantCulture)
 
-    @if (bannerEvent == eNotificationBannerEvent.Create || (previousBanner != null && banner.Start != previousBanner.Start))
-    {
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">Visibility start:</dt>
-            <dd class="govuk-summary-list__value">@banner.Start.ToString("h:mmtt", CultureInfo.InvariantCulture).ToLower() <span class="govuk-!-margin-right-2"></span> @banner.Start.ToString("d MMMM yyyy", CultureInfo.InvariantCulture)</dd>
-        </div>
-    }
+                    @if (bannerEvent != eNotificationBannerEvent.Delete)
+                    {
+                        <span class="govuk-!-margin-right-2"></span>
+                        <span>
+                            (Version:<span class="govuk-!-margin-right-2"></span>@banner.Version)
+                        </span>
+                    }
 
-    @if (bannerEvent == eNotificationBannerEvent.Create || (previousBanner != null && banner.End != previousBanner.End))
-    {
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">Visibility end:</dt>
-            <dd class="govuk-summary-list__value">@banner.End.ToString("h:mmtt", CultureInfo.InvariantCulture).ToLower() <span class="govuk-!-margin-right-2"></span> @banner.End.ToString("d MMMM yyyy", CultureInfo.InvariantCulture)</dd>
-        </div>
-    }
+                </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">User:</dt>
+                <dd class="govuk-summary-list__value">@banner.AuditUser</dd>
+            </div>
 
-    @if (bannerEvent == eNotificationBannerEvent.Create || (previousBanner != null && banner.Content != previousBanner.Content))
-    {
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">Message:</dt>
-            <dd class="govuk-summary-list__value">@banner.Content</dd>
-        </div>
-    }
+            @if (bannerEvent == eNotificationBannerEvent.Create || (previousBanner != null && banner.Start != previousBanner.Start))
+            {
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Visibility start:</dt>
+                    <dd class="govuk-summary-list__value">@banner.Start.ToString("h:mmtt", CultureInfo.InvariantCulture).ToLower() <span class="govuk-!-margin-right-2"></span> @banner.Start.ToString("d MMMM yyyy", CultureInfo.InvariantCulture)</dd>
+                </div>
+            }
 
-    @if (bannerEvent == eNotificationBannerEvent.Create || (previousBanner != null && banner.Importance != previousBanner.Importance))
-    {
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">Status:</dt>
-            <dd class="govuk-summary-list__value">@(((eNotificationBannerImportance) banner.Importance).EnumDisplayNameFor())</dd>
-        </div>
-    }
+            @if (bannerEvent == eNotificationBannerEvent.Create || (previousBanner != null && banner.End != previousBanner.End))
+            {
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Visibility end:</dt>
+                    <dd class="govuk-summary-list__value">@banner.End.ToString("h:mmtt", CultureInfo.InvariantCulture).ToLower() <span class="govuk-!-margin-right-2"></span> @banner.End.ToString("d MMMM yyyy", CultureInfo.InvariantCulture)</dd>
+                </div>
+            }
 
-</dl>
+            @if (bannerEvent == eNotificationBannerEvent.Create || (previousBanner != null && banner.Content != previousBanner.Content))
+            {
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Message:</dt>
+                    <dd class="govuk-summary-list__value">@banner.Content</dd>
+                </div>
+            }
+
+            @if (bannerEvent == eNotificationBannerEvent.Create || (previousBanner != null && banner.Importance != previousBanner.Importance))
+            {
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Status:</dt>
+                    <dd class="govuk-summary-list__value">@(((eNotificationBannerImportance) banner.Importance).EnumDisplayNameFor())</dd>
+                </div>
+            }
+
+        </dl>
 
         if (bannerEvent == eNotificationBannerEvent.Update)
         {
             <details class="govuk-details" data-module="govuk-details">
                 <summary class="govuk-details__summary">
                     <span class="govuk-details__summary-text">
-                        Show
+                        Show version @banner.Version
                     </span>
                 </summary>
                 <div class="govuk-details__text">
