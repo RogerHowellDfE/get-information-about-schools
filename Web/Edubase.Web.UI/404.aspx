@@ -167,11 +167,11 @@
             beta
         </strong>
         <span class="govuk-phase-banner__text">
-            This is a new service. Your
+            How could we improve this service? Your 
             <a href="https://forms.office.com/Pages/ResponsePage.aspx?id=yXfS-grGoU2187O4s0qC-ZYZAR7wa5FMmFGoqFTjsw5UREJBVlAxSTBKWFdOMEcwTTU1M0gyVVJKRCQlQCN0PWcu">
                 feedback
             </a>
-            will help us improve it.
+            will help.
         </span>
 </div>
 
@@ -213,10 +213,12 @@
                     <div class="footer-meta-inner">
                         <h2 class="visuallyhidden">Support links</h2>
                         <ul>
-                            <li><a href="/cookies">Cookies</a></li>
-                            <!--<li><a href="#">Contact</a></li>-->
+                            <li><a href="/Contact">Contact</a></li>
+                            <li><a href="/glossary">Glossary</a></li>
                             <li><a href="/guidance">Guidance</a></li>
-                            <li><a href="/news">News</a></li>
+                            <li><a href="/Privacy">Privacy</a></li>
+                            <li><a href="/cookies">Cookies</a></li>
+                            <li><a href="/Accessibility">Accessibility statement</a></li>
                         </ul>
 
                         <div class="open-government-licence">

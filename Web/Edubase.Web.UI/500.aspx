@@ -118,11 +118,11 @@
                     beta
                 </strong>
                 <span class="govuk-phase-banner__text">
-                    This is a new service. Your
+                    How could we improve this service? Your 
                     <a href="https://forms.office.com/Pages/ResponsePage.aspx?id=yXfS-grGoU2187O4s0qC-ZYZAR7wa5FMmFGoqFTjsw5UREJBVlAxSTBKWFdOMEcwTTU1M0gyVVJKRCQlQCN0PWcu">
                         feedback
                     </a>
-                    will help us improve it.
+                    will help.
                 </span>
             </p>
         </div>
@@ -164,9 +164,10 @@
                     <h2 class="govuk-visually-hidden">Support links</h2>
                     <ul class="govuk-footer__inline-list">
                         <li class="govuk-footer__inline-list-item"><a class="govuk-footer__link" href="/Contact">Contact</a></li>
-                        <li class="govuk-footer__inline-list-item"><a class="govuk-footer__link" href="/cookies">Cookies</a></li>
                         <li class="govuk-footer__inline-list-item"><a class="govuk-footer__link" href="/glossary">Glossary</a></li>
                         <li class="govuk-footer__inline-list-item"><a class="govuk-footer__link" href="/Guidance">Guidance</a></li>
+                        <li class="govuk-footer__inline-list-item"><a class="govuk-footer__link" href="/Privacy">Privacy</a></li>
+                        <li class="govuk-footer__inline-list-item"><a class="govuk-footer__link" href="/cookies">Cookies</a></li>
                         <li class="govuk-footer__inline-list-item"><a class="govuk-footer__link" href="/accessibility">Accessibility statement</a></li>
 
                     </ul>
