@@ -54,6 +54,7 @@ using Edubase.Web.UI.Filters;
 using Microsoft.WindowsAzure.Storage;
 using Edubase.Services.Geo;
 using Edubase.Services.IntegrationEndPoints.OSPlaces;
+using Autofac.Features.AttributeFilters;
 
 namespace Edubase.Web.UI
 {
@@ -116,9 +117,11 @@ namespace Edubase.Web.UI
             builder.RegisterType<PlacesLookupService>().As<IPlacesLookupService>();
 
             builder.RegisterInstance(CreateCscpClient()).SingleInstance().Named<HttpClient>("CscpClient");
+
             builder.Register(c => new CSCPService(c.ResolveNamed<HttpClient>("CscpClient"))).As<ICSCPService>();
 
             builder.RegisterInstance(CreateSfbClient()).SingleInstance().Named<HttpClient>("SfbClient");
+
             builder.Register(c => new FBService(c.ResolveNamed<HttpClient>("SfbClient"))).As<IFBService>();
 
             builder.RegisterType<ExternalLookupService>().As<IExternalLookupService>().SingleInstance().AutoActivate();
@@ -134,8 +137,10 @@ namespace Edubase.Web.UI
 
             builder.RegisterInstance(CreateJsonMediaTypeFormatter()).SingleInstance().AsSelf();
 
-            builder.RegisterInstance(CreateHttpClient()).SingleInstance().AsSelf();
-            builder.RegisterType<HttpClientWrapper>().AsSelf();
+            builder.RegisterInstance(CreateHttpClient()).SingleInstance().Named<HttpClient>("HttpClient");
+            builder.RegisterInstance(CreateHttpClientRestPoc()).SingleInstance().Named<HttpClient>("RestPocHttpClient");
+
+            builder.RegisterType<HttpClientWrapper>().AsSelf().WithAttributeFiltering();
 
             builder.RegisterType<GovernorDownloadApiService>().As<IGovernorDownloadService>();
             builder.RegisterType<GovernorsReadApiService>().As<IGovernorsReadService>();
@@ -183,6 +188,23 @@ namespace Edubase.Web.UI
                     DateTimeZoneHandling = DateTimeZoneHandling.Unspecified
                 }
             };
+        }
+
+        public static HttpClient CreateHttpClientRestPoc()
+        {
+            var client = new HttpClient(new HttpClientHandler { UseCookies = false })
+            {
+                BaseAddress = new Uri(ConfigurationManager.AppSettings["RestPocBaseAddress"]),
+                Timeout = TimeSpan.FromSeconds(180),
+            };
+
+            var apiUsername = ConfigurationManager.AppSettings["api:Username"];
+            var apiPassword = ConfigurationManager.AppSettings["api:Password"];
+
+            if (apiUsername != null && apiPassword != null)
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", new BasicAuthCredentials(apiUsername, apiPassword).ToString());
+
+            return client;
         }
 
         public static HttpClient CreateHttpClient()

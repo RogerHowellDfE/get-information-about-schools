@@ -1,7 +1,5 @@
 namespace Edubase.Services
 {
-    using Autofac;
-    using Autofac.Features.AttributeFilters;
     using Common;
     using Common.IO;
     using Core;
@@ -27,40 +25,34 @@ namespace Edubase.Services
     using Texuna.Core;
     using Texuna.Glimpse;
 
-    public class HttpClientWrapper
+    public class HttpClientWrapperRestPoc
     {
         private readonly HttpClient _httpClient;
-        private readonly HttpClient _httpClientRestPoc;
         private readonly JsonMediaTypeFormatter _formatter;
         private readonly ApiRecorderSessionItemRepository _apiRecorderSessionItemRepository;
         private const string HEADER_SA_USER_ID = "sa_user_id";
         private const string REQ_BODY_JSON_PAYLOAD = "EdubaseRequestBodyJsonPayload";
         private readonly IClientStorage _clientStorage;
 
-        public HttpClientWrapper([KeyFilter("HttpClient")] HttpClient httpClient,
-            [KeyFilter("RestPocHttpClient")] HttpClient httpClientRestPoc,
-            JsonMediaTypeFormatter formatter,
-            IClientStorage clientStorage,
-            ApiRecorderSessionItemRepository apiRecorderSessionItemRepository)
+        public HttpClientWrapperRestPoc(HttpClient httpClient, JsonMediaTypeFormatter formatter, IClientStorage clientStorage, ApiRecorderSessionItemRepository apiRecorderSessionItemRepository)
         {
             _httpClient = httpClient;
-            _httpClientRestPoc = httpClientRestPoc;
             _clientStorage = clientStorage;
             _formatter = formatter;
             _apiRecorderSessionItemRepository = apiRecorderSessionItemRepository;
         }
         
-        public HttpClientWrapper(HttpClient httpClient) : this(httpClient, null, null, null, null)
+        public HttpClientWrapperRestPoc(HttpClient httpClient) : this(httpClient, null, null, null)
         {
 
         }
 
-        public HttpClientWrapper(HttpClient httpClient, JsonMediaTypeFormatter formatter) : this(httpClient, null, formatter, null, null)
+        public HttpClientWrapperRestPoc(HttpClient httpClient, JsonMediaTypeFormatter formatter) : this(httpClient, formatter, null, null)
         {
 
         }
 
-        public HttpClientWrapper(HttpClient httpClient, JsonMediaTypeFormatter formatter, IClientStorage clientStorage) : this(httpClient, null, formatter, clientStorage, null)
+        public HttpClientWrapperRestPoc(HttpClient httpClient, JsonMediaTypeFormatter formatter, IClientStorage clientStorage) : this(httpClient, formatter, clientStorage, null)
         {
 
         }
@@ -70,7 +62,6 @@ namespace Edubase.Services
         public async Task<ApiResponse<TResponse>> GetAsync<TResponse>(string uri, IPrincipal principal, bool throwOnNotFound)
         {
             var requestMessage = await CreateHttpRequestMessageAsync(HttpMethod.Get, uri, principal);
-
             var result = await SendAsync(requestMessage);
             return await ParseHttpResponseMessageAsync<TResponse>(uri, result, throwOnNotFound);
         }
@@ -360,12 +351,7 @@ namespace Edubase.Services
 
             try
             {
-                var uri = requestMessage.RequestUri.ToString();
-                if(!uri.Contains("suggest"))
-                {
-                    response = await _httpClientRestPoc.SendAsync(requestMessage);
-                    return response;
-                }
+                _httpClient.BaseAddress = new Uri(ConfigurationManager.AppSettings["RestPocBaseAddress"]);
                 response = await _httpClient.SendAsync(requestMessage);
                 return response;
             }
