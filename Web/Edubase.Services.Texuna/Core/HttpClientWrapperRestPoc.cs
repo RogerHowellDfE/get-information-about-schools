@@ -1,5 +1,6 @@
 namespace Edubase.Services
 {
+    using Autofac.Features.AttributeFilters;
     using Common;
     using Common.IO;
     using Core;
@@ -34,7 +35,10 @@ namespace Edubase.Services
         private const string REQ_BODY_JSON_PAYLOAD = "EdubaseRequestBodyJsonPayload";
         private readonly IClientStorage _clientStorage;
 
-        public HttpClientWrapperRestPoc(HttpClient httpClient, JsonMediaTypeFormatter formatter, IClientStorage clientStorage, ApiRecorderSessionItemRepository apiRecorderSessionItemRepository)
+        public HttpClientWrapperRestPoc([KeyFilter("RestPocHttpClient")] HttpClient httpClient,
+            JsonMediaTypeFormatter formatter,
+            IClientStorage clientStorage,
+            ApiRecorderSessionItemRepository apiRecorderSessionItemRepository)
         {
             _httpClient = httpClient;
             _clientStorage = clientStorage;
@@ -351,7 +355,7 @@ namespace Edubase.Services
 
             try
             {
-                _httpClient.BaseAddress = new Uri(ConfigurationManager.AppSettings["RestPocBaseAddress"]);
+                //_httpClient.BaseAddress = new Uri(ConfigurationManager.AppSettings["RestPocBaseAddress"]);
                 response = await _httpClient.SendAsync(requestMessage);
                 return response;
             }

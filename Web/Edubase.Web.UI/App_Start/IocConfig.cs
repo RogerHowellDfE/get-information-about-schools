@@ -141,6 +141,7 @@ namespace Edubase.Web.UI
             builder.RegisterInstance(CreateHttpClientRestPoc()).SingleInstance().Named<HttpClient>("RestPocHttpClient");
 
             builder.RegisterType<HttpClientWrapper>().AsSelf().WithAttributeFiltering();
+            builder.RegisterType<HttpClientWrapperRestPoc>().AsSelf().WithAttributeFiltering();
 
             builder.RegisterType<GovernorDownloadApiService>().As<IGovernorDownloadService>();
             builder.RegisterType<GovernorsReadApiService>().As<IGovernorsReadService>();

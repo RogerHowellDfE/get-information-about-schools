@@ -30,37 +30,36 @@ namespace Edubase.Services
     public class HttpClientWrapper
     {
         private readonly HttpClient _httpClient;
-        private readonly HttpClient _httpClientRestPoc;
+       // private readonly HttpClient _httpClientRestPoc;
         private readonly JsonMediaTypeFormatter _formatter;
         private readonly ApiRecorderSessionItemRepository _apiRecorderSessionItemRepository;
         private const string HEADER_SA_USER_ID = "sa_user_id";
         private const string REQ_BODY_JSON_PAYLOAD = "EdubaseRequestBodyJsonPayload";
         private readonly IClientStorage _clientStorage;
 
-        public HttpClientWrapper([KeyFilter("HttpClient")] HttpClient httpClient,
-            [KeyFilter("RestPocHttpClient")] HttpClient httpClientRestPoc,
+        public HttpClientWrapper([KeyFilter("HttpClient")] HttpClient httpClient,         
             JsonMediaTypeFormatter formatter,
             IClientStorage clientStorage,
             ApiRecorderSessionItemRepository apiRecorderSessionItemRepository)
         {
             _httpClient = httpClient;
-            _httpClientRestPoc = httpClientRestPoc;
+           // _httpClientRestPoc = httpClientRestPoc;
             _clientStorage = clientStorage;
             _formatter = formatter;
             _apiRecorderSessionItemRepository = apiRecorderSessionItemRepository;
         }
         
-        public HttpClientWrapper(HttpClient httpClient) : this(httpClient, null, null, null, null)
+        public HttpClientWrapper(HttpClient httpClient) : this(httpClient, null, null, null)
         {
 
         }
 
-        public HttpClientWrapper(HttpClient httpClient, JsonMediaTypeFormatter formatter) : this(httpClient, null, formatter, null, null)
+        public HttpClientWrapper(HttpClient httpClient, JsonMediaTypeFormatter formatter) : this(httpClient,  formatter, null, null)
         {
 
         }
 
-        public HttpClientWrapper(HttpClient httpClient, JsonMediaTypeFormatter formatter, IClientStorage clientStorage) : this(httpClient, null, formatter, clientStorage, null)
+        public HttpClientWrapper(HttpClient httpClient, JsonMediaTypeFormatter formatter, IClientStorage clientStorage) : this(httpClient, formatter, clientStorage, null)
         {
 
         }
@@ -360,12 +359,12 @@ namespace Edubase.Services
 
             try
             {
-                var uri = requestMessage.RequestUri.ToString();
-                if(!uri.Contains("suggest"))
-                {
-                    response = await _httpClientRestPoc.SendAsync(requestMessage);
-                    return response;
-                }
+                //var uri = requestMessage.RequestUri.ToString();
+                //if (!uri.Contains("suggest"))
+                //{
+                //    response = await _httpClientRestPoc.SendAsync(requestMessage);
+                //    return response;
+                //}
                 response = await _httpClient.SendAsync(requestMessage);
                 return response;
             }
