@@ -31,10 +31,14 @@ namespace Edubase.Services.Texuna.Establishments
 
         private readonly ICachedLookupService _cachedLookupService;
         private readonly HttpClientWrapper _httpClient;
+        private readonly HttpClientWrapperRestPoc _httpClientRestPoc;
 
-        public EstablishmentReadApiService(HttpClientWrapper httpClient, ICachedLookupService cachedLookupService)
+        public EstablishmentReadApiService(HttpClientWrapper httpClient,
+            HttpClientWrapperRestPoc httpClientRestPoc,
+            ICachedLookupService cachedLookupService)
         {
             _httpClient = httpClient;
+            _httpClientRestPoc = httpClientRestPoc;
             _cachedLookupService = cachedLookupService;
         }
 
@@ -58,7 +62,7 @@ namespace Edubase.Services.Texuna.Establishments
         }
 
         public async Task<ServiceResultDto<EstablishmentModel>> GetAsync(int urn, IPrincipal principal)
-                    => new ServiceResultDto<EstablishmentModel>((await _httpClient.GetAsync<EstablishmentModel>($"establishment/{urn}", principal, false)).Response);
+                    => new ServiceResultDto<EstablishmentModel>((await _httpClientRestPoc.GetAsync<EstablishmentModel>($"establishment/{urn}", principal, false)).Response);
 
         public async Task<PaginatedResult<EstablishmentChangeDto>> GetChangeHistoryAsync(int urn, int skip, int take, string sortBy, IPrincipal user)
         {
