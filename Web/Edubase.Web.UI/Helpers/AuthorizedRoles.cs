@@ -4,6 +4,7 @@ namespace Edubase.Web.UI.Helpers
     public static class AuthorizedRoles
     {
         public const string IsAdmin = EdubaseRoles.ROLE_BACKOFFICE;
+        public const string CanMarkFederationAsCreatedInError = EdubaseRoles.ROLE_BACKOFFICE + "," + EdubaseRoles.LAMSGT;
         public const string CanDefineAdditionalAddresses = EdubaseRoles.ROLE_BACKOFFICE + "," + EdubaseRoles.EDUBASE_CMT + "," + EdubaseRoles.IEBT;
         public const string CanAccessTools = EdubaseRoles.ROLE_BACKOFFICE + "," + EdubaseRoles.IEBT;
         public const string CanSearchIndependentSchools = EdubaseRoles.ROLE_BACKOFFICE + "," + EdubaseRoles.EDUBASE + "," + EdubaseRoles.EDUBASE_CMT + "," + EdubaseRoles.IEBT;

@@ -810,9 +810,11 @@ namespace Edubase.Web.UI.Areas.Groups.Controllers
 
         private async Task<GroupEditorViewModel> SetEditPermissions(GroupEditorViewModel viewModel)
         {
-            viewModel.CanUserCloseAndMarkAsCreatedInError = viewModel.GroupType.OneOfThese(GT.MultiacademyTrust, GT.SingleacademyTrust, GT.SchoolSponsor, GT.Federation)
-                                                               && !viewModel.StatusId.OneOfThese(GS.CreatedInError, GS.Closed)
-                                                               && User.InRole(AuthorizedRoles.IsAdmin);
+            viewModel.CanUserCloseAndMarkAsCreatedInError =
+                !viewModel.StatusId.OneOfThese(GS.CreatedInError, GS.Closed) &&
+                ((viewModel.GroupType.OneOfThese(GT.MultiacademyTrust, GT.SingleacademyTrust, GT.SchoolSponsor) && User.InRole(AuthorizedRoles.IsAdmin)) ||
+                 (viewModel.GroupType.OneOfThese(GT.Federation) && User.InRole(AuthorizedRoles.CanMarkFederationAsCreatedInError)));
+
 
             viewModel.IsLocalAuthorityEditable = viewModel.GroupTypeId.OneOfThese(GT.ChildrensCentresCollaboration, GT.ChildrensCentresGroup)
                                                  && viewModel.LinkedEstablishments.Establishments.Count == 0 && User.InRole(AuthorizedRoles.IsAdmin);
