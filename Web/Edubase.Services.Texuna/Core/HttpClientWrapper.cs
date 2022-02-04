@@ -372,7 +372,7 @@
                 {
                     responseMessage = await response.Content?.ReadAsStringAsync();
                 }
-#if DEBUG
+
                 var data = new ApiTraceData
                 {
                     StartTime = startTime,
@@ -388,7 +388,6 @@
                 };
 
                 ApiTrace.Data.Add(data);
-#endif
 
                 await LogApiInteraction(requestMessage, response, responseMessage, stopwatch.Elapsed, context?.User?.Identity?.GetUserId());
             }
