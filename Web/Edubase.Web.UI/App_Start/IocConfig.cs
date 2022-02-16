@@ -199,6 +199,8 @@ namespace Edubase.Web.UI
                 Timeout = TimeSpan.FromSeconds(180),
             };
 
+            client.DefaultRequestHeaders.Add("x-functions-key", ConfigurationManager.AppSettings["GetGroupByIdFAKey"]);
+
             var apiUsername = ConfigurationManager.AppSettings["api:Username"];
             var apiPassword = ConfigurationManager.AppSettings["api:Password"];
 
