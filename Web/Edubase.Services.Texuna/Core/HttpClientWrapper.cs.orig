@@ -1,0 +1,150 @@
+namespace Edubase.Services
+{
+    using Core;
+    using Data.Repositories;
+    using System.Net.Http;
+    using System.Net.Http.Formatting;
+    using Texuna.Core;
+    using Autofac.Features.AttributeFilters;
+
+    public class HttpClientWrapper : ClientWrapperBase
+    {
+        public HttpClientWrapper([KeyFilter(nameof(HttpClientWrapper))] HttpClient httpClient, JsonMediaTypeFormatter formatter, IClientStorage clientStorage, ApiRecorderSessionItemRepository apiRecorderSessionItemRepository)
+            : base(httpClient, formatter, clientStorage, apiRecorderSessionItemRepository)
+        {
+        }
+<<<<<<< HEAD
+
+        private T TryDeserializeAsync<T>(string json) where T : class
+        {
+            try { return JsonConvert.DeserializeObject<T>(json); }
+            catch { return null; }
+        }
+
+        private async Task<HttpResponseMessage> SendAsync(HttpRequestMessage requestMessage)
+        {
+            var startTime = DateTime.UtcNow;
+            HttpResponseMessage response = null;
+            var stopwatch = Stopwatch.StartNew();
+
+            try
+            {
+                response = await _httpClient.SendAsync(requestMessage);
+                return response;
+            }
+            catch (TaskCanceledException ex) when (!ex.CancellationToken.IsCancellationRequested
+            ) // timeout, apparently: ref; https://stackoverflow.com/questions/29179848/httpclient-a-task-was-cancelled
+            {
+                throw new TexunaApiSystemException(
+                    $"The API did not respond in a timely manner (Request URI: {requestMessage.RequestUri.PathAndQuery})",
+                    GetRequestJsonBody(requestMessage));
+            }
+            finally
+            {
+                stopwatch.Stop();
+                string responseMessage = null;
+
+                var context = HttpContext.Current;
+
+                if (response?.Content != null)
+                {
+                    responseMessage = await response.Content?.ReadAsStringAsync();
+                }
+
+                var data = new ApiTraceData
+                {
+                    StartTime = startTime,
+                    DurationMillis = (int)Math.Round((DateTime.UtcNow - startTime).TotalMilliseconds, 0),
+                    Method = requestMessage.Method.Method,
+                    Url = requestMessage.RequestUri.ToString(),
+                    Request = $"{requestMessage.Headers}{Environment.NewLine}{GetRequestJsonBody(requestMessage)}",
+                    Response = $"{response?.Headers}{Environment.NewLine}{responseMessage}",
+                    ResponseCode = response != null ? (int)response.StatusCode : 0,
+                    ClientIpAddress = context?.Request.UserHostAddress,
+                    UserId = context?.User?.Identity?.GetUserId(),
+                    UserName = context?.User?.Identity?.GetUserName()
+                };
+
+                ApiTrace.Data.Add(data);
+
+                await LogApiInteraction(requestMessage, response, responseMessage, stopwatch.Elapsed, context?.User?.Identity?.GetUserId());
+            }
+        }
+
+        private async Task LogApiInteraction(HttpRequestMessage requestMessage, HttpResponseMessage response, string responseMessage, TimeSpan elapsed, string userId)
+        {
+            try
+            {
+                bool.TryParse(ConfigurationManager.AppSettings["EnableApiLogging"], out bool enableApiLogging);
+                var apiSessionId = _clientStorage?.Get("ApiSessionId") ?? (enableApiLogging ? userId.Clean() : null);
+
+                if (apiSessionId != null && _apiRecorderSessionItemRepository != null)
+                {
+                    if (responseMessage == null && response?.Content != null)
+                    {
+                        responseMessage = await response.Content?.ReadAsStringAsync();
+                    }
+
+                    await _apiRecorderSessionItemRepository.CreateAsync(new Data.Entity.ApiRecorderSessionItem(apiSessionId, requestMessage.RequestUri.AbsolutePath)
+                    {
+                        HttpMethod = requestMessage.Method.ToString(),
+                        RawRequestBody = GetRequestJsonBody(requestMessage),
+                        RawResponseBody = responseMessage.Ellipsis(32000),
+                        RequestHeaders = ToJsonIndented(requestMessage.Headers),
+                        ResponseHeaders = ToJsonIndented(response.Headers),
+                        ElapsedTimeSpan = elapsed.ToString(),
+                        ElapsedMS = elapsed.TotalMilliseconds
+                    });
+                }
+            }
+            catch (Exception)
+            {
+                
+            }
+        }
+
+        public async Task<HttpRequestMessage> CreateHttpRequestMessageAsync(HttpMethod method, string uri, IPrincipal principal, object requestBodyData = null)
+        {
+            if (uri.StartsWith("/")) throw new Exception($"{nameof(uri)} parameter value starts with a forward-slash.  You didn't want to do that.");
+
+            var requestMessage = new HttpRequestMessage(method, uri);
+            requestMessage.Headers.Add(HEADER_SA_USER_ID, principal.GetUserId() ?? string.Empty);
+            requestMessage.Headers.Add("X-Source-IP", _clientStorage.IPAddress);
+            if (requestBodyData != null)
+            {
+                requestMessage.Content = new ObjectContent<object>(requestBodyData, _formatter);
+                requestMessage.Properties[REQ_BODY_JSON_PAYLOAD] = await requestMessage.Content.ReadAsStringAsync();
+            }
+            else requestMessage.Properties[REQ_BODY_JSON_PAYLOAD] = string.Empty;
+
+            return requestMessage;
+        }
+
+        private string GetRequestJsonBody(HttpRequestMessage msg) => msg != null && msg.Properties.ContainsKey(REQ_BODY_JSON_PAYLOAD) ? msg.Properties[REQ_BODY_JSON_PAYLOAD]?.ToString() ?? string.Empty : string.Empty;
+
+        public string ToJsonIndented(HttpHeaders headers)
+        {
+            var dict = ToDictionary(headers);
+            return JsonConvert.SerializeObject(dict, Formatting.Indented);
+        }
+
+        private static Dictionary<string, string> ToDictionary(HttpHeaders headers)
+        {
+            var dict = new Dictionary<string, string>();
+            foreach (var item in headers.ToList())
+            {
+                if (item.Value != null)
+                {
+                    var header = item.Value.Aggregate(string.Empty, (current, value) => $"{current}{value} ");
+                    header = header.TrimEnd(" ".ToCharArray());
+                    dict.Add(item.Key, header);
+                }
+            }
+            return dict;
+        }
+
+        #endregion
+=======
+>>>>>>> feature/51707-api-replacement
+    }
+}
