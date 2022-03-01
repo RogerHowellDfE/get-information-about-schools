@@ -36,7 +36,7 @@ jobs:
 
       - name: Restore Packages
         working-directory: ./Web
-        run: nuget restore EdubaseWeb.sln
+        run: nuget restore EdubaseWeb.sln -verbosity detailed
 
       - name: Build Solution
         working-directory: ./Web
