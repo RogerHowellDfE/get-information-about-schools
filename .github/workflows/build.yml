@@ -24,7 +24,7 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Move to working dir
-        run: cd /Web
+        run: cd ./Web
         
       - name: Install dependencies
         run: dotnet restore
