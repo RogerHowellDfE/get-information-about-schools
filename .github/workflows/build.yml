@@ -14,6 +14,7 @@ jobs:
   build:
     runs-on: windows-latest
     env:
+      AZURE_ARTIFACTS_FEED_URL: "https://agilefactory.pkgs.visualstudio.com/_packaging/DM.Common/nuget/v3/index.json"
       DOTNET_VERSION: '5.0.x'
       VSS_NUGET_EXTERNAL_FEED_ENDPOINTS: '{"endpointCredentials": [{"endpoint":"https://agilefactory.pkgs.visualstudio.com/_packaging/DM.Common/nuget/v3/index.json", "password":"${{ secrets.AZURE_PACKAGE_FEED_TOKEN }}"}]'
 
@@ -24,6 +25,9 @@ jobs:
         uses: actions/setup-dotnet@v2
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
+          source-url: ${{ env.AZURE_ARTIFACTS_FEED_URL }}
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.AZURE_PACKAGE_FEED_TOKEN }} 
           
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1
