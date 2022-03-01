@@ -28,24 +28,31 @@ jobs:
       - name: Setup VSTest
         uses: darenm/Setup-VSTest@v1
 
-      - name: Navigate to Workspace
-        run: cd ./Web
-
       - name: Restore Packages
+        working-directory: ./Web
         run: dotnet restore EdubaseWeb.sln
 
       - name: Build Solution
+        working-directory: ./Web
         run: |
           msbuild.exe EdubaseWeb.sln /p:platform="Any CPU" /p:configuration="Release"
         
       ## Currently manually specifying the tests to trigger -- unclear if these can be picked up automatically?
       - name: Run Tests
+        working-directory: ./Web
         run: |
-          vstest.console.exe .\Edubase.CommonUnitTests\bin\Release\Edubase.CommonUnitTests.dll
-          vstest.console.exe .\Edubase.DataUnitTests\bin\Release\Edubase.DataUnitTests.dll
-          vstest.console.exe .\Edubase.ServicesUnitTests\bin\Release\Edubase.ServicesUnitTests.dll
-          vstest.console.exe .\Edubase.Web.ResourcesUnitTests\bin\Release\Edubase.Web.ResourcesUnitTests.dll
-          vstest.console.exe .\Edubase.Web.UIUnitTests\bin\Release\Edubase.Web.UIUnitTests.dll
+          vstest.console.exe /Enablecodecoverage .\Edubase.CommonUnitTests\bin\Release\Edubase.CommonUnitTests.dll
+          vstest.console.exe /Enablecodecoverage .\Edubase.DataUnitTests\bin\Release\Edubase.DataUnitTests.dll
+          vstest.console.exe /Enablecodecoverage .\Edubase.ServicesUnitTests\bin\Release\Edubase.ServicesUnitTests.dll
+          vstest.console.exe /Enablecodecoverage .\Edubase.Web.ResourcesUnitTests\bin\Release\Edubase.Web.ResourcesUnitTests.dll
+          vstest.console.exe /Enablecodecoverage .\Edubase.Web.UIUnitTests\bin\Release\Edubase.Web.UIUnitTests.dll
 
 
-      
+      - name: Upload dotnet test results
+        uses: actions/upload-artifact@v2
+        with:
+          name: dotnet-results-${{ env.DOTNET_VERSION }}
+          path: TestResults
+        if: ${{ always() }}
+        
+        
