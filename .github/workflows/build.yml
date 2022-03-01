@@ -15,6 +15,7 @@ jobs:
     runs-on: windows-latest
     env:
       DOTNET_VERSION: '5.0.x'
+      VSS_NUGET_EXTERNAL_FEED_ENDPOINTS: '{"endpointCredentials": [{"endpoint":"https://agilefactory.pkgs.visualstudio.com/_packaging/DM.Common/nuget/v3/index.json", "password":"${{ secrets.AZURE_PACKAGE_FEED_TOKEN }}"}]'
 
     steps:
       - uses: actions/checkout@v2
