@@ -35,7 +35,7 @@ jobs:
 
       - name: Restore Packages
         working-directory: ./Web
-        run: dotnet restore EdubaseWeb.sln
+        run: nuget restore EdubaseWeb.sln
 
       - name: Build Solution
         working-directory: ./Web
