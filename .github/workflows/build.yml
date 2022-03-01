@@ -23,15 +23,18 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Move to working dir
-        run: cd ./Web
-        
       - name: Install dependencies
+        working-directory: ./Web
         run: dotnet restore
+        
       - name: Build
+        working-directory: ./Web
         run: dotnet build --configuration Release --no-restore
+        
       - name: Test
+        working-directory: ./Web
         run: dotnet test --logger trx --results-directory "TestResults-${{ env.DOTNET_VERSION }}"
+        
       - name: Upload dotnet test results
         uses: actions/upload-artifact@v2
         with:
@@ -40,6 +43,7 @@ jobs:
         if: ${{ always() }}
 
       - name: Create the package
+        working-directory: ./Web
         run: dotnet pack --configuration Release
       - name: Upload package
         uses: actions/upload-artifact@v2
