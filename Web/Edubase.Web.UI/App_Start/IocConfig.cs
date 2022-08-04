@@ -136,6 +136,7 @@ namespace Edubase.Web.UI
 
             builder.RegisterInstance(CreateHttpClient()).SingleInstance().AsSelf();
             builder.RegisterType<HttpClientWrapper>().AsSelf();
+            builder.RegisterType<HttpClientWrapper>().As<IHttpClientWrapper>();
 
             builder.RegisterType<GovernorDownloadApiService>().As<IGovernorDownloadService>();
             builder.RegisterType<GovernorsReadApiService>().As<IGovernorsReadService>();
@@ -168,8 +169,9 @@ namespace Edubase.Web.UI
             builder.RegisterType<GlossaryRepository>().AsSelf().SingleInstance();
             builder.RegisterType<FaqItemRepository>().AsSelf().SingleInstance();
             builder.RegisterType<FaqGroupRepository>().AsSelf().SingleInstance();
-            builder.RegisterType<NotificationTemplateRepository>().AsSelf().SingleInstance();
             builder.RegisterType<NotificationBannerRepository>().AsSelf().SingleInstance();
+            builder.RegisterType<NotificationTemplateRepository>().AsSelf().SingleInstance();
+            builder.RegisterType<NewsArticleRepository>().AsSelf().SingleInstance();
         }
 
         public static JsonMediaTypeFormatter CreateJsonMediaTypeFormatter()
