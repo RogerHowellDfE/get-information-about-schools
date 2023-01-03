@@ -72,5 +72,5 @@ jobs:
         working-directory: ./Web
         run: |
           ..\.sonar\scanner\dotnet-sonarscanner begin /k:"RogerHowellDfE_get-information-about-schools" /o:"rogerhowelldfe" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
-          msbuild.exe EdubaseWeb.sln  /t:Rebuild /p:platform="Any CPU" /p:configuration="Release"
+          msbuild.exe EdubaseWeb.sln  /t:Rebuild /p:platform="Any CPU" /p:configuration="Release" -m
           ..\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
