@@ -9,6 +9,10 @@ jobs:
   build:
     name: Build and analyze
     runs-on: windows-latest
+    env:
+      AZURE_ARTIFACTS_FEED_URL: "https://agilefactory.pkgs.visualstudio.com/_packaging/DM.Common/nuget/v3/index.json"
+      DOTNET_VERSION: '6.0.x'
+      
     steps:
       - name: Set up JDK 11
         uses: actions/setup-java@v1
