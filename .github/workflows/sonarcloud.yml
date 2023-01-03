@@ -69,6 +69,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
+        working-directory: ./Web
         run: |
           .\.sonar\scanner\dotnet-sonarscanner begin /k:"RogerHowellDfE_get-information-about-schools" /o:"rogerhowelldfe" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
           msbuild.exe EdubaseWeb.sln  /t:Rebuild /p:platform="Any CPU" /p:configuration="Release"
