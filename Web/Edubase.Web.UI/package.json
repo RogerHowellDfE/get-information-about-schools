@@ -16,7 +16,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@babel/preset-env": "^7.7.7",
+    "@babel/preset-env": "^7.20.2",
     "@most/prelude": "^1.8.0",
     "autoprefixer": "^10.2.6",
     "babel-core": "^6.26.3",
