@@ -24,6 +24,11 @@ jobs:
   analyze_c_sharp:
     name: Analyze C#
     runs-on: windows-latest
+
+    ## Avoid when triggered by Dependabot (`triggering_actor` allows for manual run/re-run)
+    ## https://docs.github.com/en/actions/learn-github-actions/contexts#github-context
+    if: ${{ github.triggering_actor != 'dependabot[bot]' }}
+
     permissions:
       actions: read
       contents: read
@@ -101,6 +106,11 @@ jobs:
   analyze_javascript:
     name: Analyze Javascript
     runs-on: ubuntu-latest
+
+    ## Avoid when triggered by Dependabot (`triggering_actor` allows for manual run/re-run)
+    ## https://docs.github.com/en/actions/learn-github-actions/contexts#github-context
+    if: ${{ github.triggering_actor != 'dependabot[bot]' }}
+
     permissions:
       actions: read
       contents: read
