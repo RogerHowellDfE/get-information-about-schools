@@ -28,7 +28,7 @@ jobs:
     ## Avoid when triggered by bot activity (e.g., Dependabot and Renovate PR)
     ## Note: `triggering_actor` allows for manual run/re-run
     ## https://docs.github.com/en/actions/learn-github-actions/contexts#github-context
-    if: ${{ !contains(github.triggering_actor, '[bot]' }}
+    if: ${{ !contains(github.triggering_actor, '[bot]') }}
 
     permissions:
       actions: read
@@ -111,7 +111,7 @@ jobs:
     ## Avoid when triggered by bot activity (e.g., Dependabot and Renovate PR)
     ## Note: `triggering_actor` allows for manual run/re-run
     ## https://docs.github.com/en/actions/learn-github-actions/contexts#github-context
-    if: ${{ !contains(github.triggering_actor, '[bot]' }}
+    if: ${{ !contains(github.triggering_actor, '[bot]') }}
 
     permissions:
       actions: read
