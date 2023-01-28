@@ -71,12 +71,17 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         working-directory: ./Web
+        ## See also: https://github.com/coverlet-coverage/coverlet/blob/master/Documentation/VSTestIntegration.md
         run: |
-          ..\.sonar\scanner\dotnet-sonarscanner begin /k:"RogerHowellDfE_get-information-about-schools" /o:"rogerhowelldfe" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
+          ..\.sonar\scanner\dotnet-sonarscanner begin /k:"RogerHowellDfE_get-information-about-schools" /o:"rogerhowelldfe" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportsPaths
           
           msbuild.exe EdubaseWeb.sln /t:Rebuild /p:platform="Any CPU" /p:configuration="Release" /p:UseSharedCompilation=false -m
           
-          vstest.console.exe /Enablecodecoverage **\*Tests.dll --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=json,cobertura,lcov,teamcity,opencover
+          vstest.console.exe /EnableCodeCoverage --collect:"XPlat Code Coverage" --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=json,cobertura,lcov,teamcity,opencover                    
+          vstest.console.exe /EnableCodeCoverage --collect:"XPlat Code Coverage" --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=json,cobertura,lcov,teamcity,opencover                        
+          vstest.console.exe /EnableCodeCoverage --collect:"XPlat Code Coverage" --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=json,cobertura,lcov,teamcity,opencover                
+          vstest.console.exe /EnableCodeCoverage --collect:"XPlat Code Coverage" --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=json,cobertura,lcov,teamcity,opencover      
+          vstest.console.exe /EnableCodeCoverage --collect:"XPlat Code Coverage" --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=json,cobertura,lcov,teamcity,opencover              
           
           ..\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
 
