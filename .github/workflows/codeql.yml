@@ -25,9 +25,10 @@ jobs:
     name: Analyze C#
     runs-on: windows-latest
 
-    ## Avoid when triggered by Dependabot (`triggering_actor` allows for manual run/re-run)
+    ## Avoid when triggered by bot activity (e.g., Dependabot and Renovate PR)
+    ## Note: `triggering_actor` allows for manual run/re-run
     ## https://docs.github.com/en/actions/learn-github-actions/contexts#github-context
-    if: ${{ github.triggering_actor != 'dependabot[bot]' }}
+    if: ${{ !contains(github.triggering_actor, '[bot]' }}
 
     permissions:
       actions: read
@@ -107,9 +108,10 @@ jobs:
     name: Analyze Javascript
     runs-on: ubuntu-latest
 
-    ## Avoid when triggered by Dependabot (`triggering_actor` allows for manual run/re-run)
+    ## Avoid when triggered by bot activity (e.g., Dependabot and Renovate PR)
+    ## Note: `triggering_actor` allows for manual run/re-run
     ## https://docs.github.com/en/actions/learn-github-actions/contexts#github-context
-    if: ${{ github.triggering_actor != 'dependabot[bot]' }}
+    if: ${{ !contains(github.triggering_actor, '[bot]' }}
 
     permissions:
       actions: read
