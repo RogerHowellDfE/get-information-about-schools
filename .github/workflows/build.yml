@@ -63,3 +63,7 @@ jobs:
           name: dotnet-results-${{ env.DOTNET_VERSION }}
           path: ./Web/TestResults
         if: ${{ always() }}
+
+      - name: Codecov
+        uses: codecov/codecov-action@v3.1.1
+
