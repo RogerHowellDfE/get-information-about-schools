@@ -48,7 +48,7 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v3.3.0
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
@@ -65,7 +65,7 @@ jobs:
 #### BEGIN CUSTOM BUILD STEPS FOR C# PROJECTS WHICH USE PRIVATE NUGET FEED
 
     - name: Setup .NET Core SDK ${{ env.DOTNET_VERSION }}
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v3.0.3
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
         source-url: ${{ env.AZURE_ARTIFACTS_FEED_URL }}
@@ -73,13 +73,13 @@ jobs:
         NUGET_AUTH_TOKEN: ${{ secrets.AZURE_PACKAGE_FEED_TOKEN }}
 
     - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v1
+      uses: microsoft/setup-msbuild@v1.1.3
 
     - name: Setup NuGet
       uses: NuGet/setup-nuget@v1.1.1
 
     - name: Setup VSTest
-      uses: darenm/Setup-VSTest@v1
+      uses: darenm/Setup-VSTest@v1.2
 
     - name: Restore Packages
       working-directory: ./Web
@@ -97,7 +97,7 @@ jobs:
       with:
         category: "/language:${{matrix.language}}"
 
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v3.1.2
       with:
         name: codeql-sarif-files-${{ matrix.language }}
         path: ${{ runner.workspace }}/results/${{ matrix.language }}.sarif
@@ -127,7 +127,7 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v3.3.0
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
@@ -162,7 +162,7 @@ jobs:
       with:
         category: "/language:${{matrix.language}}"
 
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v3.1.2
       with:
         name: codeql-sarif-files-${{ matrix.language }}
         path: ${{ runner.workspace }}/results/${{ matrix.language }}.sarif
