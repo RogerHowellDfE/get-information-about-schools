@@ -67,5 +67,5 @@ jobs:
       - name: Codecov
         uses: codecov/codecov-action@v3.1.1
         with:
-          files: ./**/*.cobertura.xml
+          files: ${{ runner.workspace }}/**/*.cobertura.xml
 
