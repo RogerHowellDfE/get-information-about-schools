@@ -73,15 +73,15 @@ jobs:
         working-directory: ./Web
         ## See also: https://github.com/coverlet-coverage/coverlet/blob/master/Documentation/VSTestIntegration.md
         run: |
-          ..\.sonar\scanner\dotnet-sonarscanner begin /k:"RogerHowellDfE_get-information-about-schools" /o:"rogerhowelldfe" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportsPaths="./Web/TestResults/**/*.cobertura.xml" /d:sonar.verbose=true
+          ..\.sonar\scanner\dotnet-sonarscanner begin /k:"RogerHowellDfE_get-information-about-schools" /o:"rogerhowelldfe" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.verbose=true
           
           msbuild.exe EdubaseWeb.sln /t:Rebuild /p:platform="Any CPU" /p:configuration="Release" /p:UseSharedCompilation=false -m
           
-          vstest.console.exe /Enablecodecoverage .\Edubase.CommonUnitTests\bin\Release\Edubase.CommonUnitTests.dll                 -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=json,cobertura,lcov,teamcity,opencover
-          vstest.console.exe /Enablecodecoverage .\Edubase.DataUnitTests\bin\Release\Edubase.DataUnitTests.dll                     -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=json,cobertura,lcov,teamcity,opencover
-          vstest.console.exe /Enablecodecoverage .\Edubase.ServicesUnitTests\bin\Release\Edubase.ServicesUnitTests.dll             -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=json,cobertura,lcov,teamcity,opencover
-          vstest.console.exe /Enablecodecoverage .\Edubase.Web.ResourcesUnitTests\bin\Release\Edubase.Web.ResourcesUnitTests.dll   -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=json,cobertura,lcov,teamcity,opencover
-          vstest.console.exe /Enablecodecoverage .\Edubase.Web.UIUnitTests\bin\Release\net48\Edubase.Web.UIUnitTests.dll           -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=json,cobertura,lcov,teamcity,opencover
+          vstest.console.exe /Enablecodecoverage .\Edubase.CommonUnitTests\bin\Release\Edubase.CommonUnitTests.dll                 --logger trx -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=json,cobertura,lcov,teamcity,opencover
+          vstest.console.exe /Enablecodecoverage .\Edubase.DataUnitTests\bin\Release\Edubase.DataUnitTests.dll                     --logger trx -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=json,cobertura,lcov,teamcity,opencover
+          vstest.console.exe /Enablecodecoverage .\Edubase.ServicesUnitTests\bin\Release\Edubase.ServicesUnitTests.dll             --logger trx -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=json,cobertura,lcov,teamcity,opencover
+          vstest.console.exe /Enablecodecoverage .\Edubase.Web.ResourcesUnitTests\bin\Release\Edubase.Web.ResourcesUnitTests.dll   --logger trx -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=json,cobertura,lcov,teamcity,opencover
+          vstest.console.exe /Enablecodecoverage .\Edubase.Web.UIUnitTests\bin\Release\net48\Edubase.Web.UIUnitTests.dll           --logger trx -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=json,cobertura,lcov,teamcity,opencover
 
           ..\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
 
