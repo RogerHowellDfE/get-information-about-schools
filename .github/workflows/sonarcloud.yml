@@ -76,7 +76,7 @@ jobs:
           
           msbuild.exe EdubaseWeb.sln /t:Rebuild /p:platform="Any CPU" /p:configuration="Release" /p:UseSharedCompilation=false -m
           
-          vstest.console.exe /Enablecodecoverage **\*Tests.csproj
+          vstest.console.exe /Enablecodecoverage **\*Tests.csproj --collect:"XPlat Code Coverage"
           
           ..\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
 
