@@ -77,7 +77,11 @@ jobs:
           
           msbuild.exe EdubaseWeb.sln /t:Rebuild /p:platform="Any CPU" /p:configuration="Release" /p:UseSharedCompilation=false -m
           
-          vstest.console.exe /Enablecodecoverage .\**\*Tests.csproj           --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=json,cobertura,lcov,teamcity,opencover                    
+          vstest.console.exe /Enablecodecoverage .\Edubase.CommonUnitTests\bin\Release\Edubase.CommonUnitTests.dll                 -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=json,cobertura,lcov,teamcity,opencover
+          vstest.console.exe /Enablecodecoverage .\Edubase.DataUnitTests\bin\Release\Edubase.DataUnitTests.dll                     -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=json,cobertura,lcov,teamcity,opencover
+          vstest.console.exe /Enablecodecoverage .\Edubase.ServicesUnitTests\bin\Release\Edubase.ServicesUnitTests.dll             -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=json,cobertura,lcov,teamcity,opencover
+          vstest.console.exe /Enablecodecoverage .\Edubase.Web.ResourcesUnitTests\bin\Release\Edubase.Web.ResourcesUnitTests.dll   -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=json,cobertura,lcov,teamcity,opencover
+          vstest.console.exe /Enablecodecoverage .\Edubase.Web.UIUnitTests\bin\Release\net48\Edubase.Web.UIUnitTests.dll           -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=json,cobertura,lcov,teamcity,opencover
 
           ..\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
 
