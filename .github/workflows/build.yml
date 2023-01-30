@@ -100,4 +100,4 @@ jobs:
       - name: Codecov
         uses: codecov/codecov-action@v3.1.1
         with:
-          files: ${{ github.workspace }}/Web/TestResults/0.cobertura.xml,${{ github.workspace }}/Web/TestResults/1.cobertura.xml,${{ github.workspace }}/Web/TestResults/2.cobertura.xml,${{ github.workspace }}/Web/TestResults/3.cobertura.xml
+          files: ${{ github.workspace }}\Web\TestResults\0.cobertura.xml,${{ github.workspace }}\Web\TestResults\1.cobertura.xml,${{ github.workspace }}\Web\TestResults\2.cobertura.xml,${{ github.workspace }}\Web\TestResults\3.cobertura.xml
