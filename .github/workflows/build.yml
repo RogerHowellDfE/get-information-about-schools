@@ -64,8 +64,15 @@ jobs:
           path: ./Web/TestResults
         if: ${{ always() }}
 
+      - shell: powershell
+        run: |
+          Get-ChildItem -Path ${{ runner.workspace }} –Recurse
+
+      - shell: powershell
+        run: |
+          Get-ChildItem -Path ./Web/TestResults –Recurse
+
       - name: Codecov
         uses: codecov/codecov-action@v3.1.1
         with:
           files: ${{ runner.workspace }}/**/*.cobertura.xml
-
