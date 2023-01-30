@@ -79,4 +79,8 @@ jobs:
       - name: Codecov
         uses: codecov/codecov-action@v3.1.1
         with:
-          files: ./Web/TestResults/*.cobertura.xml
+          files:
+            ./Web/TestResults/0.cobertura.xml
+            ./Web/TestResults/1.cobertura.xml
+            ./Web/TestResults/2.cobertura.xml
+            ./Web/TestResults/3.cobertura.xml
