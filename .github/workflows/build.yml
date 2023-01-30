@@ -62,11 +62,13 @@ jobs:
 
       - shell: powershell
         run: |
-          Get-ChildItem -Path ${{ runner.workspace }} –Recurse
+          Get-ChildItem -Path ${{ runner.workspace }} -Recurse
+        continue-on-error: true
 
       - shell: powershell
         run: |
-          Get-ChildItem -Path ./Web/TestResults –Recurse
+          Get-ChildItem -Path ./Web/TestResults -Recurse
+        continue-on-error: true
 
       - name: Codecov
         uses: codecov/codecov-action@v3.1.1
