@@ -14,7 +14,6 @@ jobs:
   build:
     runs-on: windows-latest
     env:
-      AZURE_ARTIFACTS_FEED_URL: "https://agilefactory.pkgs.visualstudio.com/_packaging/DM.Common/nuget/v3/index.json"
       DOTNET_VERSION: '6.0.x'
 
     steps:
@@ -24,9 +23,6 @@ jobs:
         uses: actions/setup-dotnet@v3.0.3
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
-          source-url: ${{ env.AZURE_ARTIFACTS_FEED_URL }}
-        env:
-          NUGET_AUTH_TOKEN: ${{ secrets.AZURE_PACKAGE_FEED_TOKEN }}
 
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1.1.3
@@ -50,11 +46,11 @@ jobs:
       - name: Run Tests
         working-directory: ./Web
         run: |
-          vstest.console.exe /Enablecodecoverage .\Edubase.CommonUnitTests\bin\Release\Edubase.CommonUnitTests.dll
-          vstest.console.exe /Enablecodecoverage .\Edubase.DataUnitTests\bin\Release\Edubase.DataUnitTests.dll
-          vstest.console.exe /Enablecodecoverage .\Edubase.ServicesUnitTests\bin\Release\Edubase.ServicesUnitTests.dll
-          vstest.console.exe /Enablecodecoverage .\Edubase.Web.ResourcesUnitTests\bin\Release\Edubase.Web.ResourcesUnitTests.dll
-          vstest.console.exe /Enablecodecoverage .\Edubase.Web.UIUnitTests\bin\Release\net48\Edubase.Web.UIUnitTests.dll
+          vstest.console.exe /Enablecodecoverage .\Edubase.CommonUnitTests\bin\Release\Edubase.CommonUnitTests.dll                  -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=json,cobertura,lcov,teamcity,opencover
+          vstest.console.exe /Enablecodecoverage .\Edubase.DataUnitTests\bin\Release\Edubase.DataUnitTests.dll                      -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=json,cobertura,lcov,teamcity,opencover
+          vstest.console.exe /Enablecodecoverage .\Edubase.ServicesUnitTests\bin\Release\Edubase.ServicesUnitTests.dll              -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=json,cobertura,lcov,teamcity,opencover
+          vstest.console.exe /Enablecodecoverage .\Edubase.Web.ResourcesUnitTests\bin\Release\Edubase.Web.ResourcesUnitTests.dll    -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=json,cobertura,lcov,teamcity,opencover
+          vstest.console.exe /Enablecodecoverage .\Edubase.Web.UIUnitTests\bin\Release\net48\Edubase.Web.UIUnitTests.dll            -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=json,cobertura,lcov,teamcity,opencover
 
 
       - name: Upload dotnet test results
@@ -63,3 +59,47 @@ jobs:
           name: dotnet-results-${{ env.DOTNET_VERSION }}
           path: ./Web/TestResults
         if: ${{ always() }}
+
+      - shell: powershell
+        run: |
+          Get-ChildItem -Path ./Web/TestResults -Recurse
+        continue-on-error: true
+
+      - name: move expected cobertura files to known filenames
+        shell: powershell
+        run: |
+          Get-ChildItem -Path ./Web/TestResults -Filter "*.cobertura.xml" -Recurse -Attributes !Directory | ForEach-Object -Begin {$counter = 0} -Process { Copy-Item $_.FullName -Destination "./Web/TestResults/$($counter).cobertura.xml" ; $counter++}
+        continue-on-error: true
+
+      - shell: powershell
+        run: |
+          Get-ChildItem -Path ./Web/TestResults -Recurse
+        continue-on-error: true
+
+      - shell: powershell
+        run: |
+          Get-ChildItem -Path ./Web/TestResults -Recurse | Select-Object FullName
+        continue-on-error: true
+
+      - shell: powershell
+        run: |
+          Test-Path -Path ${{ github.workspace }}/Web/TestResults/0.cobertura.xml -PathType Leaf
+          Test-Path -Path ${{ github.workspace }}/Web/TestResults/1.cobertura.xml -PathType Leaf
+          Test-Path -Path ${{ github.workspace }}/Web/TestResults/2.cobertura.xml -PathType Leaf
+          Test-Path -Path ${{ github.workspace }}/Web/TestResults/3.cobertura.xml -PathType Leaf
+        continue-on-error: true
+
+      - shell: powershell
+        run: |
+          Test-Path -Path ./Web/TestResults/0.cobertura.xml -PathType Leaf
+          Test-Path -Path ./Web/TestResults/1.cobertura.xml -PathType Leaf
+          Test-Path -Path ./Web/TestResults/2.cobertura.xml -PathType Leaf
+          Test-Path -Path ./Web/TestResults/3.cobertura.xml -PathType Leaf
+        continue-on-error: true
+
+      - name: Codecov
+        uses: codecov/codecov-action@v3.1.1
+        with:
+          directory: ${{ github.workspace }}\Web\TestResults
+          files: ./0.cobertura.xml,./1.cobertura.xml,./2.cobertura.xml,./3.cobertura.xml
+          verbose: true
