@@ -76,8 +76,32 @@ jobs:
           Get-ChildItem -Path ./Web/TestResults -Recurse
         continue-on-error: true
 
+      - shell: powershell
+        run: |
+          Get-ChildItem -Path ./Web/TestResults -Recurse | Select-Object FullName
+        continue-on-error: true
+
+      - shell: powershell
+        run: |
+          Test-Path -Path ${{ github.workspace }}/Web/TestResults/0.cobertura.xml -PathType Leaf
+          Test-Path -Path ${{ github.workspace }}/Web/TestResults/1.cobertura.xml -PathType Leaf
+          Test-Path -Path ${{ github.workspace }}/Web/TestResults/2.cobertura.xml -PathType Leaf
+          Test-Path -Path ${{ github.workspace }}/Web/TestResults/3.cobertura.xml -PathType Leaf
+        continue-on-error: true
+
+      - shell: powershell
+        run: |
+          Test-Path -Path ./Web/TestResults/0.cobertura.xml -PathType Leaf
+          Test-Path -Path ./Web/TestResults/1.cobertura.xml -PathType Leaf
+          Test-Path -Path ./Web/TestResults/2.cobertura.xml -PathType Leaf
+          Test-Path -Path ./Web/TestResults/3.cobertura.xml -PathType Leaf
+        continue-on-error: true
+
       - name: Codecov
         uses: codecov/codecov-action@v3.1.1
         with:
           files:
-            ${{ github.workspace }}/**/*.cobertura.xml
+            ${{ github.workspace }}/Web/TestResults/0.cobertura.xml
+            ${{ github.workspace }}/Web/TestResults/1.cobertura.xml
+            ${{ github.workspace }}/Web/TestResults/2.cobertura.xml
+            ${{ github.workspace }}/Web/TestResults/3.cobertura.xml
