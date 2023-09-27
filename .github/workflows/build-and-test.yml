@@ -17,8 +17,11 @@ jobs:
     env:
       DOTNET_VERSION: '6.0.x'
 
+    ## Include all git history (fetch depth 0) for enhanced SonarCloud analysis (default is 1 for most recent commit)
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       ## SonarCloud Setup
       - name: Set up JDK 17
