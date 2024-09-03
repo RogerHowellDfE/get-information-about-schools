@@ -94,7 +94,7 @@ jobs:
           ..\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
 
       - name: Upload dotnet test results
-        uses: actions/upload-artifact@v3.1.2
+        uses: actions/upload-artifact@v3.2.1
         with:
           name: dotnet-results-${{ env.DOTNET_VERSION }}
           path: ./Web/TestResults
